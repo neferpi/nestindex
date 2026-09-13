@@ -35,7 +35,10 @@ const KNOWN_HOSTS = [
   "nestindex.pages.dev",
   "pixnest-e9z.pages.dev",
   "nestkits-launch.pages.dev",
-];
+  "desarrolla.pages.dev",
+  "rafterspace.pages.dev",
+  "fishmouth.pages.dev",
+];;
 
 const DEFAULT_NOTE =
   "Cloudflare edge visits — crawlers and probes count; not unique humans.";

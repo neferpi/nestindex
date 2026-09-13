@@ -1,52 +1,67 @@
 {
-  "updatedAt": "2026-09-13T12:32:10.857007+00:00",
+  "updatedAt": "2026-09-13T20:09:38.706781+00:00",
   "window": "7d",
   "note": "Cloudflare edge traffic (requestSource=eyeball): visits+requests include crawlers, IndexNow, Googlebot, deploys/smoke checks, etc. Not unique humans.",
   "sites": [
     {
       "host": "stamply-cdm.pages.dev",
-      "visits": 106,
-      "requests": 706
+      "visits": 126,
+      "requests": 1278
     },
     {
       "host": "cronnest.pages.dev",
-      "visits": 102,
-      "requests": 653
+      "visits": 107,
+      "requests": 720
     },
     {
       "host": "miltime-2tu.pages.dev",
-      "visits": 195,
-      "requests": 784
+      "visits": 255,
+      "requests": 1079
     },
     {
       "host": "chromanest.pages.dev",
-      "visits": 134,
-      "requests": 728
+      "visits": 155,
+      "requests": 1001
     },
     {
       "host": "calcnest-7k5.pages.dev",
-      "visits": 114,
-      "requests": 876
+      "visits": 128,
+      "requests": 1146
     },
     {
       "host": "unitnest.pages.dev",
-      "visits": 570,
-      "requests": 1302
+      "visits": 790,
+      "requests": 1990
     },
     {
       "host": "nestindex.pages.dev",
-      "visits": 66,
-      "requests": 819
+      "visits": 79,
+      "requests": 972
     },
     {
       "host": "pixnest-e9z.pages.dev",
-      "visits": 135,
-      "requests": 900
+      "visits": 142,
+      "requests": 1282
     },
     {
       "host": "nestkits-launch.pages.dev",
-      "visits": 75,
-      "requests": 487
+      "visits": 100,
+      "requests": 665
+    },
+    {
+      "host": "desarrolla.pages.dev",
+      "visits": 47,
+      "requests": 398
+    },
+    {
+      "host": "rafterspace.pages.dev",
+      "visits": 37,
+      "requests": 214
+    },
+    {
+      "host": "fishmouth.pages.dev",
+      "visits": 31,
+      "requests": 160
     }
   ]
 }

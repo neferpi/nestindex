@@ -4,7 +4,10 @@ export type Category =
   | "design"
   | "calculators"
   | "converters"
-  | "images";
+  | "images"
+  | "spatial"
+  | "starters"
+  | "extensions";
 
 export type Project = {
   slug: string;
@@ -19,15 +22,48 @@ export type Project = {
 
 export const CATEGORIES: { id: Category | "all"; label: string }[] = [
   { id: "all", label: "All" },
+  { id: "spatial", label: "Spatial" },
   { id: "time", label: "Time" },
   { id: "developers", label: "Developers" },
   { id: "design", label: "Design" },
   { id: "calculators", label: "Calculators" },
   { id: "converters", label: "Converters" },
   { id: "images", label: "Images" },
+  { id: "starters", label: "Starters" },
+  { id: "extensions", label: "Extensions" },
 ];
 
 export const PROJECTS: Project[] = [
+  {
+    slug: "desarrolla",
+    name: "Desarrolla",
+    pitch: "Sheet-metal unfold — 3D fittings to flat nets with SVG/DXF export.",
+    category: "spatial",
+    url: "https://desarrolla.pages.dev",
+    host: "desarrolla.pages.dev",
+    github: "https://github.com/neferpi/desarrolla",
+    accent: "#f59e0b",
+  },
+  {
+    slug: "rafterspace",
+    name: "RafterSpace",
+    pitch: "Live 3D roof framing — hips, jacks, cheek bevels, cut list.",
+    category: "spatial",
+    url: "https://rafterspace.pages.dev",
+    host: "rafterspace.pages.dev",
+    github: "https://github.com/neferpi/rafterspace",
+    accent: "#84cc16",
+  },
+  {
+    slug: "fishmouth",
+    name: "Fishmouth",
+    pitch: "Pipe intersections → printable wrap templates for the shop.",
+    category: "spatial",
+    url: "https://fishmouth.pages.dev",
+    host: "fishmouth.pages.dev",
+    github: "https://github.com/neferpi/fishmouth",
+    accent: "#06b6d4",
+  },
   {
     slug: "stamply",
     name: "Stamply",
@@ -88,7 +124,6 @@ export const PROJECTS: Project[] = [
     github: "https://github.com/neferpi/unitnest",
     accent: "#fb923c",
   },
-
   {
     slug: "pixnest",
     name: "PixNest",
@@ -97,8 +132,26 @@ export const PROJECTS: Project[] = [
     url: "https://pixnest-e9z.pages.dev",
     host: "pixnest-e9z.pages.dev",
     github: "https://github.com/neferpi/pixnest",
-    accent: "#38bdf8",
+    accent: "#22d3ee",
   },
-
-]
-;
+  {
+    slug: "nestkits-launch",
+    name: "NestKits Launch",
+    pitch: "Free MIT launch starter — landing, waitlist, Stripe stub on Pages.",
+    category: "starters",
+    url: "https://nestkits-launch.pages.dev",
+    host: "nestkits-launch.pages.dev",
+    github: "https://github.com/neferpi/nestkits-launch",
+    accent: "#c084fc",
+  },
+  {
+    slug: "nestpin",
+    name: "NestPin",
+    pitch: "Chrome extension — nest & pin ChatGPT + Claude chats locally.",
+    category: "extensions",
+    url: "https://github.com/neferpi/nestpin",
+    host: "",
+    github: "https://github.com/neferpi/nestpin",
+    accent: "#e879f9",
+  },
+];
