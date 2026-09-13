@@ -38,7 +38,7 @@ export function ProjectCard({ project, visits, rank }: Props) {
             {formatVisits(visits)}
           </p>
           <p className="text-[11px] uppercase tracking-wide text-zinc-500">
-            visits · 7d
+            CF edge · 7d
           </p>
         </div>
       </div>

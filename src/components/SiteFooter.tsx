@@ -20,8 +20,8 @@ export function SiteFooter() {
           <Link href="/about" className="hover:text-zinc-300">
             About & privacy
           </Link>
-          <span title="Precomputed into stats.json — no Cloudflare token in the browser">
-            Views from Cloudflare, refreshed daily.
+          <span title="Precomputed into stats.json — CF edge visits, not unique humans; no Cloudflare token in the browser">
+            CF edge visits (bots count) · refreshed daily
           </span>
         </p>
       </div>

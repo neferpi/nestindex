@@ -1,8 +1,8 @@
 # NestIndex
 
-**every Nest tool, ranked by real traffic.**
+**every Nest tool, ranked by Cloudflare edge traffic.**
 
-Public static gallery of [neferpi](https://github.com/neferpi) Nest tools, sorted by Cloudflare view counts.
+Public static gallery of [neferpi](https://github.com/neferpi) Nest tools, sorted by Cloudflare **edge** visit counts (crawlers and probes count — **not** unique humans).
 
 - Live (expected): https://nestindex.pages.dev  
 - Repo: https://github.com/neferpi/nestindex
@@ -27,8 +27,6 @@ npm run build
 # → out/  (includes out/stats.json)
 ```
 
-Do **not** deploy Cloudflare from this agent — Pitou deploys Pages.
-
 ## Catalog
 
 Project metadata is hardcoded in `src/lib/projects.ts` (slug, name, pitch, category, live URL, Cloudflare host, GitHub URL, accent). Hosts may get a `-suffix` on Pages after first deploy; patch `host` / `url` if needed.
@@ -37,12 +35,15 @@ Project metadata is hardcoded in `src/lib/projects.ts` (slug, name, pitch, categ
 
 Stats are **precomputed** into `public/stats.json`. The site never calls Cloudflare APIs.
 
+**Honesty:** `visits` / `requests` are Cloudflare edge metrics (`requestSource: eyeball`). They still include bots, IndexNow, Googlebot, deploys, and smoke checks. UI labels say “CF edge”, not “views” / people.
+
 Shape:
 
 ```json
 {
   "updatedAt": "2026-09-13T10:00:00Z",
   "window": "7d",
+  "note": "Cloudflare edge visits — crawlers and probes count; not unique humans.",
   "sites": [
     { "host": "cronnest.pages.dev", "visits": 0, "requests": 0 }
   ]
@@ -51,7 +52,7 @@ Shape:
 
 ### From `pages-traffic.py`
 
-On the box, Pitou’s script lives at `/workspace/scripts/pages-traffic.py`. It prints JSON with `last_7d` / `last_24h` maps of host → `{visits, requests, bytes}`.
+On the box, the script lives at `/workspace/scripts/pages-traffic.py`. It prints JSON with `note`, `last_7d` / `last_24h` maps of host → `{visits, requests, bytes}`.
 
 Merge into NestIndex:
 
@@ -78,14 +79,15 @@ Then rebuild / redeploy so `out/stats.json` ships with the site:
 
 ```bash
 npm run build
+npx wrangler pages deploy out --project-name=nestindex
 ```
 
 ## Pages
 
 | Path | Description |
 |------|-------------|
-| `/` | Gallery grid sorted by visits desc; optional category filter |
-| `/about` | What NestIndex is, stats source, privacy |
+| `/` | Gallery grid sorted by edge visits desc; optional category filter |
+| `/about` | What NestIndex is, stats source (edge ≠ humans), privacy |
 
 ## License
 

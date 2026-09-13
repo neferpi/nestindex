@@ -9,11 +9,13 @@
  * Input shapes accepted:
  *   1) { "host": { "visits": n, "requests": n }, ... }
  *   2) pages-traffic.py style:
- *      { "as_of": "...", "last_7d": { "host": { "visits", "requests", "bytes" }, ... } }
- *      → uses last_7d
+ *      { "as_of": "...", "note": "...", "last_7d": { "host": { "visits", "requests", "bytes" }, ... } }
+ *      → uses last_7d (visits key kept for compat; UI labels them as CF edge, not humans)
  *
  * Output: public/stats.json
- *   { "updatedAt": ISO8601, "window": "7d", "sites": [ { host, visits, requests } ] }
+ *   { "updatedAt": ISO8601, "window": "7d", "note": "...", "sites": [ { host, visits, requests } ] }
+ *
+ * Honesty: `visits` are Cloudflare edge visits (crawlers/probes count), NOT unique humans.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -28,9 +30,15 @@ const KNOWN_HOSTS = [
   "cronnest.pages.dev",
   "miltime-2tu.pages.dev",
   "chromanest.pages.dev",
-  "calcnest.pages.dev",
+  "calcnest-7k5.pages.dev",
   "unitnest.pages.dev",
+  "nestindex.pages.dev",
+  "pixnest-e9z.pages.dev",
+  "nestkits-launch.pages.dev",
 ];
+
+const DEFAULT_NOTE =
+  "Cloudflare edge visits — crawlers and probes count; not unique humans.";
 
 function readInput(arg) {
   if (!arg || arg === "-") {
@@ -43,16 +51,19 @@ function normalize(raw) {
   let map = raw;
   let updatedAt = new Date().toISOString();
   let window = "7d";
+  let note = DEFAULT_NOTE;
 
   if (raw && typeof raw === "object" && raw.last_7d) {
     map = raw.last_7d;
     if (raw.as_of) updatedAt = raw.as_of;
+    if (typeof raw.note === "string" && raw.note.trim()) note = raw.note.trim();
     window = "7d";
   } else if (raw && typeof raw === "object" && Array.isArray(raw.sites)) {
     // already NestIndex shape — refresh timestamp, keep sites
     return {
       updatedAt: raw.updatedAt || updatedAt,
       window: raw.window || window,
+      note: (typeof raw.note === "string" && raw.note.trim()) || DEFAULT_NOTE,
       sites: raw.sites.map((s) => ({
         host: s.host,
         visits: Number(s.visits) || 0,
@@ -74,6 +85,7 @@ function normalize(raw) {
   return {
     updatedAt,
     window,
+    note,
     sites: [...byHost.values()],
   };
 }
@@ -82,7 +94,8 @@ const arg = process.argv[2];
 if (!arg) {
   console.error(
     "Usage: node scripts/write-stats.mjs <input.json|->\n" +
-      "  Input: host→{visits,requests} or pages-traffic.py JSON (uses last_7d).",
+      "  Input: host→{visits,requests} or pages-traffic.py JSON (uses last_7d).\n" +
+      "  Output visits are CF edge metrics, not unique humans.",
   );
   process.exit(1);
 }

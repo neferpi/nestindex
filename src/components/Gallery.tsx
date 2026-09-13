@@ -68,14 +68,14 @@ export function Gallery() {
             Nest tools, ranked
           </h1>
           <p className="mt-2 max-w-xl text-sm text-zinc-400 sm:text-base">
-            Every Nest tool, sorted by real traffic. New sites start at zero and
-            still appear in the gallery.
+            Every Nest tool, sorted by Cloudflare edge visits (not unique humans).
+            New sites start at zero and still appear in the gallery.
           </p>
         </div>
         <div className="text-sm text-zinc-500">
-          {loadState === "loading" && <span>Loading views…</span>}
+          {loadState === "loading" && <span>Loading edge stats…</span>}
           {loadState === "error" && (
-            <span>Views unavailable — showing all tools at 0.</span>
+            <span>Edge stats unavailable — showing all tools at 0.</span>
           )}
           {loadState === "ok" && stats && (
             <span>
@@ -83,8 +83,9 @@ export function Gallery() {
               {stats.window}
             </span>
           )}
-          <p className="mt-1 text-xs text-zinc-600">
-            Views from Cloudflare, refreshed daily.
+          <p className="mt-1 max-w-sm text-xs text-zinc-600">
+            Cloudflare edge visits — crawlers and probes count; not unique
+            humans.
           </p>
         </div>
       </div>

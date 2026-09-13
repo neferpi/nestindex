@@ -1,3 +1,4 @@
+/** Site traffic row. `visits` is a Cloudflare edge metric, not unique humans. */
 export type SiteStats = {
   host: string;
   visits: number;
@@ -7,6 +8,8 @@ export type SiteStats = {
 export type StatsFile = {
   updatedAt: string;
   window: string;
+  /** Optional honesty note from the stats pipeline. */
+  note?: string;
   sites: SiteStats[];
 };
 

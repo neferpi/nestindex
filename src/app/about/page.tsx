@@ -33,23 +33,48 @@ export default function AboutPage() {
             neferpi
           </a>
           . Cards link out to each live tool and its GitHub repo. The list is
-          sorted by real visit counts so popular tools float up — without any
-          login or account.
+          sorted by Cloudflare edge visit counts so high-traffic hosts float up
+          — without any login or account. Those numbers are{" "}
+          <strong className="font-medium text-zinc-100">not</strong> unique
+          human visitors.
         </p>
       </section>
 
       <section className="space-y-3 text-zinc-300">
         <h2 className="text-xl font-semibold text-zinc-100">How stats work</h2>
         <p>
-          Visit and request counts come from{" "}
+          Counts come from{" "}
           <strong className="font-medium text-zinc-100">
             Cloudflare edge analytics
           </strong>{" "}
-          (Pages HTTP adaptive groups) for each tool&apos;s{" "}
+          (Pages HTTP adaptive groups, filtered to{" "}
+          <code className="rounded bg-zinc-900 px-1.5 py-0.5 text-sm text-emerald-300">
+            requestSource: eyeball
+          </code>
+          ) for each tool&apos;s{" "}
           <code className="rounded bg-zinc-900 px-1.5 py-0.5 text-sm text-emerald-300">
             *.pages.dev
           </code>{" "}
-          host. Numbers are aggregated offline, written into{" "}
+          host. We keep the raw{" "}
+          <code className="rounded bg-zinc-900 px-1.5 py-0.5 text-sm text-emerald-300">
+            visits
+          </code>{" "}
+          /{" "}
+          <code className="rounded bg-zinc-900 px-1.5 py-0.5 text-sm text-emerald-300">
+            requests
+          </code>{" "}
+          keys for compatibility, but UI labels say{" "}
+          <em>CF edge</em> — not people.
+        </p>
+        <p>
+          Edge visits still include bots and automation that inflate new sites:
+          crawlers, IndexNow pings, Googlebot / Search Console checks, deploy
+          previews, and our own smoke tests. A brand-new tool can show hundreds
+          of “visits” with almost no real humans. We do not invent
+          human-unique analytics — honesty over pretty numbers.
+        </p>
+        <p>
+          Numbers are aggregated offline, written into{" "}
           <code className="rounded bg-zinc-900 px-1.5 py-0.5 text-sm text-emerald-300">
             public/stats.json
           </code>
@@ -70,8 +95,9 @@ export default function AboutPage() {
             cookies.
           </li>
           <li>
-            Rankings use aggregate host-level visit/request totals from
-            Cloudflare — not individual visitor profiles.
+            Rankings use aggregate host-level edge visit/request totals from
+            Cloudflare — not individual visitor profiles, and not human-unique
+            counts.
           </li>
           <li>
             Each Nest tool is a separate static site; see that tool for its own
