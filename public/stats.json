@@ -1,26 +1,26 @@
 {
-  "updatedAt": "2026-09-13T10:11:13.032315+00:00",
+  "updatedAt": "2026-09-13T10:30:25.411095+00:00",
   "window": "7d",
   "sites": [
     {
       "host": "stamply-cdm.pages.dev",
-      "visits": 44,
-      "requests": 961
+      "visits": 72,
+      "requests": 1173
     },
     {
       "host": "cronnest.pages.dev",
-      "visits": 131,
-      "requests": 1368
+      "visits": 143,
+      "requests": 1582
     },
     {
       "host": "miltime-2tu.pages.dev",
-      "visits": 181,
-      "requests": 1132
+      "visits": 200,
+      "requests": 1401
     },
     {
       "host": "chromanest.pages.dev",
-      "visits": 140,
-      "requests": 1115
+      "visits": 173,
+      "requests": 1401
     },
     {
       "host": "calcnest.pages.dev",
@@ -29,13 +29,23 @@
     },
     {
       "host": "unitnest.pages.dev",
-      "visits": 0,
-      "requests": 0
+      "visits": 501,
+      "requests": 2348
+    },
+    {
+      "host": "calcnest-7k5.pages.dev",
+      "visits": 86,
+      "requests": 974
     },
     {
       "host": "nestindex.pages.dev",
-      "visits": 26,
-      "requests": 172
+      "visits": 91,
+      "requests": 1217
+    },
+    {
+      "host": "pixnest-e9z.pages.dev",
+      "visits": 1,
+      "requests": 4
     }
   ]
 }

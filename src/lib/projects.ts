@@ -3,7 +3,8 @@ export type Category =
   | "developers"
   | "design"
   | "calculators"
-  | "converters";
+  | "converters"
+  | "images";
 
 export type Project = {
   slug: string;
@@ -23,6 +24,7 @@ export const CATEGORIES: { id: Category | "all"; label: string }[] = [
   { id: "design", label: "Design" },
   { id: "calculators", label: "Calculators" },
   { id: "converters", label: "Converters" },
+  { id: "images", label: "Images" },
 ];
 
 export const PROJECTS: Project[] = [
@@ -86,4 +88,17 @@ export const PROJECTS: Project[] = [
     github: "https://github.com/neferpi/unitnest",
     accent: "#fb923c",
   },
-];
+
+  {
+    slug: "pixnest",
+    name: "PixNest",
+    pitch: "Convert and compress images in your browser — nothing uploaded.",
+    category: "images",
+    url: "https://pixnest-e9z.pages.dev",
+    host: "pixnest-e9z.pages.dev",
+    github: "https://github.com/neferpi/pixnest",
+    accent: "#38bdf8",
+  },
+
+]
+;
