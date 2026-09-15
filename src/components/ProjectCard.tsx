@@ -3,11 +3,13 @@ import { formatVisits } from "@/lib/stats";
 
 type Props = {
   project: Project;
-  visits: number;
+  /** RUM visits, or null when the project has no Pages host (e.g. NestPin). */
+  visits: number | null;
   rank: number;
 };
 
 export function ProjectCard({ project, visits, rank }: Props) {
+  const hasHost = Boolean(project.host);
   return (
     <article
       className="group relative flex flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 shadow-sm transition hover:border-zinc-700 hover:bg-zinc-900"
@@ -35,10 +37,10 @@ export function ProjectCard({ project, visits, rank }: Props) {
         </div>
         <div className="text-right">
           <p className="text-xl font-semibold tabular-nums text-zinc-100">
-            {formatVisits(visits)}
+            {hasHost ? formatVisits(visits ?? 0) : "—"}
           </p>
           <p className="text-[11px] uppercase tracking-wide text-zinc-500">
-            CF edge · 7d
+            {hasHost ? "Real browsers · 7d" : "n/a"}
           </p>
         </div>
       </div>

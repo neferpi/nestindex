@@ -1,8 +1,8 @@
 # NestIndex
 
-**every Nest tool, ranked by Cloudflare edge traffic.**
+**every Nest tool, ranked by real browser sessions (Cloudflare Web Analytics).**
 
-Public static gallery of [neferpi](https://github.com/neferpi) Nest tools, sorted by Cloudflare **edge** visit counts (crawlers and probes count — **not** unique humans).
+Public static gallery of [neferpi](https://github.com/neferpi) Nest tools, sorted by Cloudflare **Web Analytics (RUM)** visits — JS beacon browser sessions, closer to real people than CF edge crawler counts. Still not perfect unique humans.
 
 - Live (expected): https://nestindex.pages.dev  
 - Repo: https://github.com/neferpi/nestindex
@@ -29,65 +29,64 @@ npm run build
 
 ## Catalog
 
-Project metadata is hardcoded in `src/lib/projects.ts` (slug, name, pitch, category, live URL, Cloudflare host, GitHub URL, accent). Hosts may get a `-suffix` on Pages after first deploy; patch `host` / `url` if needed.
+Project metadata is hardcoded in `src/lib/projects.ts` (slug, name, pitch, category, live URL, Cloudflare host, GitHub URL, accent). Hosts may get a `-suffix` on Pages after first deploy; patch `host` / `url` if needed. Extensions without a Pages host (NestPin) show n/a.
 
 ## Daily stats refresh
 
 Stats are **precomputed** into `public/stats.json`. The site never calls Cloudflare APIs.
 
-**Honesty:** `visits` / `requests` are Cloudflare edge metrics (`requestSource: eyeball`). They still include bots, IndexNow, Googlebot, deploys, and smoke checks. UI labels say “CF edge”, not “views” / people.
+**Honesty:** `visits` / `pageviews` are Cloudflare Web Analytics (JS beacon). Closer to real browsers than edge metrics; still not perfect unique humans (adblockers, shared devices, etc.). UI labels say “Real browsers · 7d”. Optional `edgeVisits` may be included for comparison.
 
 Shape:
 
 ```json
 {
-  "updatedAt": "2026-09-13T10:00:00Z",
+  "updatedAt": "2026-09-15T17:00:00Z",
   "window": "7d",
-  "note": "Cloudflare edge visits — crawlers and probes count; not unique humans.",
+  "note": "Cloudflare Web Analytics browser sessions (JS beacon) — …",
   "sites": [
-    { "host": "cronnest.pages.dev", "visits": 0, "requests": 0 }
+    { "host": "cronnest.pages.dev", "visits": 5, "pageviews": 10, "edgeVisits": 147, "requests": 973 }
   ]
 }
 ```
 
-### From `pages-traffic.py`
-
-On the box, the script lives at `/workspace/scripts/pages-traffic.py`. It prints JSON with `note`, `last_7d` / `last_24h` maps of host → `{visits, requests, bytes}`.
-
-Merge into NestIndex:
+### One-shot helper
 
 ```bash
-# from nestindex repo root
-python3 /workspace/scripts/pages-traffic.py > /tmp/pages-traffic.json
-node scripts/write-stats.mjs /tmp/pages-traffic.json
-# writes public/stats.json (uses last_7d)
+# from nestindex repo root — fetches RUM (+ optional edge) → public/stats.json
+./scripts/refresh-stats.sh
+# SKIP_EDGE=1 ./scripts/refresh-stats.sh   # RUM only
 ```
 
-Or pipe:
+### From `pages-rum.py` manually
+
+On the box: `/workspace/scripts/pages-rum.py`. Prints JSON with `note`, `window`, `last_7d` map of host → `{visits, pageviews}`.
 
 ```bash
-python3 /workspace/scripts/pages-traffic.py | node scripts/write-stats.mjs -
+python3 /workspace/scripts/pages-rum.py > /tmp/pages-rum.json
+python3 /workspace/scripts/pages-traffic.py > /tmp/pages-traffic.json   # optional
+node scripts/write-stats.mjs /tmp/pages-rum.json --edge /tmp/pages-traffic.json
 ```
 
-### From a plain host map
+Or pipe RUM only:
 
 ```bash
-echo '{"cronnest.pages.dev":{"visits":12,"requests":40}}' | node scripts/write-stats.mjs -
+python3 /workspace/scripts/pages-rum.py | node scripts/write-stats.mjs -
 ```
 
 Then rebuild / redeploy so `out/stats.json` ships with the site:
 
 ```bash
 npm run build
-npx wrangler pages deploy out --project-name=nestindex
+npx wrangler@3.114.15 pages deploy out --project-name=nestindex
 ```
 
 ## Pages
 
 | Path | Description |
 |------|-------------|
-| `/` | Gallery grid sorted by edge visits desc; optional category filter |
-| `/about` | What NestIndex is, stats source (edge ≠ humans), privacy |
+| `/` | Gallery grid sorted by RUM visits desc; optional category filter |
+| `/about` | What NestIndex is, stats source (WA ≠ edge), privacy |
 
 ## License
 

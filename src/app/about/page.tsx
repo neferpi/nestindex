@@ -33,10 +33,11 @@ export default function AboutPage() {
             neferpi
           </a>
           . Cards link out to each live tool and its GitHub repo. The list is
-          sorted by Cloudflare edge visit counts so high-traffic hosts float up
-          — without any login or account. Those numbers are{" "}
-          <strong className="font-medium text-zinc-100">not</strong> unique
-          human visitors.
+          sorted by Cloudflare Web Analytics browser sessions so tools with real
+          people float up — without any login or account. Those numbers are{" "}
+          <strong className="font-medium text-zinc-100">closer to real
+          browsers</strong>{" "}
+          than edge crawler counts, but still not perfect unique humans.
         </p>
       </section>
 
@@ -45,33 +46,38 @@ export default function AboutPage() {
         <p>
           Counts come from{" "}
           <strong className="font-medium text-zinc-100">
-            Cloudflare edge analytics
+            Cloudflare Web Analytics (RUM)
           </strong>{" "}
-          (Pages HTTP adaptive groups, filtered to{" "}
-          <code className="rounded bg-zinc-900 px-1.5 py-0.5 text-sm text-emerald-300">
-            requestSource: eyeball
-          </code>
-          ) for each tool&apos;s{" "}
+          — the JS beacon on each tool&apos;s{" "}
           <code className="rounded bg-zinc-900 px-1.5 py-0.5 text-sm text-emerald-300">
             *.pages.dev
           </code>{" "}
-          host. We keep the raw{" "}
+          host. We query{" "}
           <code className="rounded bg-zinc-900 px-1.5 py-0.5 text-sm text-emerald-300">
-            visits
+            rumPageloadEventsAdaptiveGroups
           </code>{" "}
-          /{" "}
+          and use{" "}
           <code className="rounded bg-zinc-900 px-1.5 py-0.5 text-sm text-emerald-300">
-            requests
+            sum.visits
           </code>{" "}
-          keys for compatibility, but UI labels say{" "}
-          <em>CF edge</em> — not people.
+          as browser sessions and{" "}
+          <code className="rounded bg-zinc-900 px-1.5 py-0.5 text-sm text-emerald-300">
+            count
+          </code>{" "}
+          as pageviews. UI labels say{" "}
+          <em>Real browsers · 7d</em> (or WA visits) — not CF edge.
         </p>
         <p>
-          Edge visits still include bots and automation that inflate new sites:
-          crawlers, IndexNow pings, Googlebot / Search Console checks, deploy
-          previews, and our own smoke tests. A brand-new tool can show hundreds
-          of “visits” with almost no real humans. We do not invent
-          human-unique analytics — honesty over pretty numbers.
+          This is different from Cloudflare{" "}
+          <em>edge</em> analytics, which count crawlers, IndexNow, Googlebot,
+          deploy previews, and smoke tests. Edge numbers can be hundreds or
+          thousands with almost no real people; RUM only counts browsers that
+          load the analytics beacon.
+        </p>
+        <p>
+          RUM is still imperfect: ad blockers, privacy mode, shared devices, and
+          JS failures mean it is not a perfect unique-human count. Chrome
+          extensions without a Pages host (e.g. NestPin) show n/a.
         </p>
         <p>
           Numbers are aggregated offline, written into{" "}
@@ -95,9 +101,8 @@ export default function AboutPage() {
             cookies.
           </li>
           <li>
-            Rankings use aggregate host-level edge visit/request totals from
-            Cloudflare — not individual visitor profiles, and not human-unique
-            counts.
+            Rankings use aggregate host-level Web Analytics visit/pageview
+            totals from Cloudflare — not individual visitor profiles.
           </li>
           <li>
             Each Nest tool is a separate static site; see that tool for its own

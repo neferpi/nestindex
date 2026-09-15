@@ -1,21 +1,27 @@
 #!/usr/bin/env node
 /**
- * Merge host→{visits,requests} JSON into public/stats.json
+ * Merge RUM (and optional edge) traffic into public/stats.json
  *
  * Usage:
- *   node scripts/write-stats.mjs input.json
- *   echo '{"cronnest.pages.dev":{"visits":12,"requests":40}}' | node scripts/write-stats.mjs -
+ *   node scripts/write-stats.mjs rum.json
+ *   node scripts/write-stats.mjs rum.json --edge edge.json
+ *   echo '{...}' | node scripts/write-stats.mjs -
  *
- * Input shapes accepted:
- *   1) { "host": { "visits": n, "requests": n }, ... }
- *   2) pages-traffic.py style:
- *      { "as_of": "...", "note": "...", "last_7d": { "host": { "visits", "requests", "bytes" }, ... } }
- *      → uses last_7d (visits key kept for compat; UI labels them as CF edge, not humans)
+ * Primary input (RUM / pages-rum.py):
+ *   { "as_of", "note", "window":"7d", "last_7d": { "host": { "visits", "pageviews" } } }
+ *
+ * Also accepts:
+ *   - plain host→{visits,pageviews} map
+ *   - legacy pages-traffic.py edge JSON (last_7d visits/requests) — treated as
+ *     visits for backward compat, but prefer RUM
+ *   - already NestIndex-shaped { sites: [...] }
+ *
+ * --edge <path>: optional pages-traffic.py JSON; adds edgeVisits (+ requests)
  *
  * Output: public/stats.json
- *   { "updatedAt": ISO8601, "window": "7d", "note": "...", "sites": [ { host, visits, requests } ] }
+ *   { updatedAt, window, note, sites: [ { host, visits, pageviews, edgeVisits?, requests? } ] }
  *
- * Honesty: `visits` are Cloudflare edge visits (crawlers/probes count), NOT unique humans.
+ * Primary sort key for the gallery is RUM `visits` (browser sessions).
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -38,51 +44,101 @@ const KNOWN_HOSTS = [
   "desarrolla.pages.dev",
   "rafterspace.pages.dev",
   "fishmouth.pages.dev",
-];;
+];
 
 const DEFAULT_NOTE =
-  "Cloudflare edge visits — crawlers and probes count; not unique humans.";
+  "Cloudflare Web Analytics browser sessions (JS beacon) — closer to real people; still not perfect unique humans.";
 
-function readInput(arg) {
+function readJson(arg) {
   if (!arg || arg === "-") {
     return JSON.parse(fs.readFileSync(0, "utf8"));
   }
   return JSON.parse(fs.readFileSync(arg, "utf8"));
 }
 
-function normalize(raw) {
-  let map = raw;
+function parseArgs(argv) {
+  const args = { input: null, edge: null };
+  const rest = [...argv];
+  while (rest.length) {
+    const a = rest.shift();
+    if (a === "--edge") {
+      args.edge = rest.shift() || null;
+    } else if (!args.input) {
+      args.input = a;
+    }
+  }
+  return args;
+}
+
+function hostMapFromTraffic(raw) {
+  if (raw && typeof raw === "object" && raw.last_7d) {
+    return {
+      map: raw.last_7d,
+      updatedAt: raw.as_of || null,
+      note: typeof raw.note === "string" && raw.note.trim() ? raw.note.trim() : null,
+      window: raw.window || "7d",
+    };
+  }
+  return { map: raw, updatedAt: null, note: null, window: "7d" };
+}
+
+function normalize(raw, edgeRaw) {
   let updatedAt = new Date().toISOString();
   let window = "7d";
   let note = DEFAULT_NOTE;
 
-  if (raw && typeof raw === "object" && raw.last_7d) {
-    map = raw.last_7d;
-    if (raw.as_of) updatedAt = raw.as_of;
-    if (typeof raw.note === "string" && raw.note.trim()) note = raw.note.trim();
-    window = "7d";
-  } else if (raw && typeof raw === "object" && Array.isArray(raw.sites)) {
-    // already NestIndex shape — refresh timestamp, keep sites
+  if (raw && typeof raw === "object" && Array.isArray(raw.sites)) {
+    const sites = raw.sites.map((s) => {
+      const row = {
+        host: s.host,
+        visits: Number(s.visits) || 0,
+        pageviews: Number(s.pageviews) || 0,
+      };
+      if (s.edgeVisits != null) row.edgeVisits = Number(s.edgeVisits) || 0;
+      if (s.requests != null) row.requests = Number(s.requests) || 0;
+      return row;
+    });
     return {
       updatedAt: raw.updatedAt || updatedAt,
       window: raw.window || window,
       note: (typeof raw.note === "string" && raw.note.trim()) || DEFAULT_NOTE,
-      sites: raw.sites.map((s) => ({
-        host: s.host,
-        visits: Number(s.visits) || 0,
-        requests: Number(s.requests) || 0,
-      })),
+      sites,
     };
   }
 
+  const { map, updatedAt: asOf, note: rumNote, window: win } =
+    hostMapFromTraffic(raw);
+  if (asOf) updatedAt = asOf;
+  if (rumNote) note = rumNote;
+  if (win) window = win;
+
   const byHost = new Map();
   for (const h of KNOWN_HOSTS) {
-    byHost.set(h, { host: h, visits: 0, requests: 0 });
+    byHost.set(h, { host: h, visits: 0, pageviews: 0 });
   }
+
   for (const [host, vals] of Object.entries(map || {})) {
     const visits = Number(vals?.visits) || 0;
-    const requests = Number(vals?.requests) || 0;
-    byHost.set(host, { host, visits, requests });
+    // RUM: pageviews; legacy edge: requests mapped only via --edge
+    const pageviews =
+      Number(vals?.pageviews) ||
+      Number(vals?.pageViews) ||
+      0;
+    byHost.set(host, { host, visits, pageviews });
+  }
+
+  if (edgeRaw) {
+    const edgeMap = hostMapFromTraffic(edgeRaw).map || {};
+    for (const [host, vals] of Object.entries(edgeMap)) {
+      const row = byHost.get(host) || {
+        host,
+        visits: 0,
+        pageviews: 0,
+      };
+      row.edgeVisits = Number(vals?.visits) || 0;
+      row.requests = Number(vals?.requests) || 0;
+      byHost.set(host, row);
+    }
   }
 
   return {
@@ -93,17 +149,20 @@ function normalize(raw) {
   };
 }
 
-const arg = process.argv[2];
-if (!arg) {
+const { input, edge } = parseArgs(process.argv.slice(2));
+if (!input) {
   console.error(
-    "Usage: node scripts/write-stats.mjs <input.json|->\n" +
-      "  Input: host→{visits,requests} or pages-traffic.py JSON (uses last_7d).\n" +
-      "  Output visits are CF edge metrics, not unique humans.",
+    "Usage: node scripts/write-stats.mjs <rum.json|-> [--edge edge.json]\n" +
+      "  Primary: pages-rum.py JSON (last_7d visits + pageviews).\n" +
+      "  Optional --edge: pages-traffic.py JSON → edgeVisits/requests.",
   );
   process.exit(1);
 }
 
-const out = normalize(readInput(arg));
+const edgeRaw = edge ? readJson(edge) : null;
+const out = normalize(readJson(input), edgeRaw);
 fs.mkdirSync(path.dirname(outPath), { recursive: true });
 fs.writeFileSync(outPath, JSON.stringify(out, null, 2) + "\n");
-console.log(`Wrote ${outPath} (${out.sites.length} sites, window=${out.window})`);
+console.log(
+  `Wrote ${outPath} (${out.sites.length} sites, window=${out.window}, RUM primary)`,
+);

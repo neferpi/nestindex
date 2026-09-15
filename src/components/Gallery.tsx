@@ -47,7 +47,7 @@ export function Gallery() {
 
   const visitsMap = useMemo(() => visitsByHost(stats), [stats]);
 
-  const ranked: { project: Project; visits: number }[] = useMemo(() => {
+  const ranked: { project: Project; visits: number | null }[] = useMemo(() => {
     const filtered =
       category === "all"
         ? PROJECTS
@@ -55,9 +55,18 @@ export function Gallery() {
     return [...filtered]
       .map((project) => ({
         project,
-        visits: visitsMap.get(project.host) ?? 0,
+        visits: project.host
+          ? (visitsMap.get(project.host) ?? 0)
+          : null,
       }))
-      .sort((a, b) => b.visits - a.visits || a.project.name.localeCompare(b.project.name));
+      .sort((a, b) => {
+        // Hostless projects (NestPin) sort last
+        const av = a.visits ?? -1;
+        const bv = b.visits ?? -1;
+        if (a.visits == null && b.visits != null) return 1;
+        if (b.visits == null && a.visits != null) return -1;
+        return bv - av || a.project.name.localeCompare(b.project.name);
+      });
   }, [category, visitsMap]);
 
   return (
@@ -68,14 +77,15 @@ export function Gallery() {
             Nest tools, ranked
           </h1>
           <p className="mt-2 max-w-xl text-sm text-zinc-400 sm:text-base">
-            Every Nest tool, sorted by Cloudflare edge visits (not unique humans).
-            New sites start at zero and still appear in the gallery.
+            Every Nest tool, sorted by Cloudflare Web Analytics browser sessions
+            (JS beacon — closer to real people than edge crawler counts). New
+            sites start at zero and still appear in the gallery.
           </p>
         </div>
         <div className="text-sm text-zinc-500">
-          {loadState === "loading" && <span>Loading edge stats…</span>}
+          {loadState === "loading" && <span>Loading browser stats…</span>}
           {loadState === "error" && (
-            <span>Edge stats unavailable — showing all tools at 0.</span>
+            <span>Browser stats unavailable — showing all tools at 0.</span>
           )}
           {loadState === "ok" && stats && (
             <span>
@@ -84,8 +94,8 @@ export function Gallery() {
             </span>
           )}
           <p className="mt-1 max-w-sm text-xs text-zinc-600">
-            Cloudflare edge visits — crawlers and probes count; not unique
-            humans.
+            Cloudflare Web Analytics (JS) — not edge traffic; still not perfect
+            unique humans.
           </p>
         </div>
       </div>
