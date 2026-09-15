@@ -48,11 +48,16 @@ export default function AboutPage() {
           <strong className="font-medium text-zinc-100">
             Cloudflare Web Analytics (RUM)
           </strong>{" "}
-          — the JS beacon on each tool&apos;s{" "}
+          — the JS beacon on each tool&apos;s live host
+          (custom domains like{" "}
+          <code className="rounded bg-zinc-900 px-1.5 py-0.5 text-sm text-emerald-300">
+            nest.darthcassan.com
+          </code>
+          , or Cloudflare{" "}
           <code className="rounded bg-zinc-900 px-1.5 py-0.5 text-sm text-emerald-300">
             *.pages.dev
           </code>{" "}
-          host. We query{" "}
+          preview URLs). We query{" "}
           <code className="rounded bg-zinc-900 px-1.5 py-0.5 text-sm text-emerald-300">
             rumPageloadEventsAdaptiveGroups
           </code>{" "}

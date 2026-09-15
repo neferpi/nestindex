@@ -4,7 +4,8 @@
 
 Public static gallery of [neferpi](https://github.com/neferpi) Nest tools, sorted by Cloudflare **Web Analytics (RUM)** visits — JS beacon browser sessions, closer to real people than CF edge crawler counts. Still not perfect unique humans.
 
-- Live (expected): https://nestindex.pages.dev  
+- Live: https://nest.darthcassan.com  
+- Cloudflare Pages preview may remain at `*.pages.dev`  
 - Repo: https://github.com/neferpi/nestindex
 
 ## Stack

@@ -1,4 +1,4 @@
-export const SITE_URL = "https://nestindex.pages.dev";
+export const SITE_URL = "https://nest.darthcassan.com";
 export const SITE_NAME = "NestIndex";
 export const SITE_TAGLINE =
   "every Nest tool, ranked by real browser sessions";
